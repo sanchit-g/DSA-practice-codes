@@ -8,14 +8,15 @@ class Node:
 
 class Solution:
     def connect(self, root: 'Node') -> 'Node':
-        self.recur(root)
+        self.connect_utility(root)
         return root
 
-    def recur(self, node: 'Node') -> None:
-        if node is None:
+    def connect_utility(self, node: 'Node') -> None:
+        if not node:
             return
+        # nxt stores pointer to the first node of next level
         curr, nxt = node, node.left
-        while curr.left:
+        while nxt:
             curr.left.next = curr.right
             if curr.next:
                 curr.right.next = curr.next.left
