@@ -2,74 +2,66 @@
 
 using namespace std;
 
-#define int 	long long
-#define endl	'/n'
+#define int long long
+#define endl '/n'
+
+const int N = 1e3 + 1;
+const int MOD = 1e9 + 7;
+const int INF = 1e9;
+
+const int dx[4] = {0, 1, 0, -1};
+const int dy[4] = {1, 0, -1, 0};
+char d[4] = {'R', 'D', 'L', 'U'};
 
 int n, m;
-char grid[1002][1002];
+char grid[N][N];
 queue<pair<int, int>> q;
-bool visited[1002][1002];
-map<pair<int, int>, pair<int, int>> parent;
+int pre[N][N];
 
-void bfs(int x, int y) {
-	q.push({x, y});
-	visited[x][y] = 1;
+bool isValid(int i, int j) {
+	return 0 <= i && i < n && 0 <= j && j < m && grid[i][j] == '.';
+}
+
+bool isDestination(int i, int j) {
+	return 0 <= i && i < n && 0 <= j && j < m && grid[i][j] == 'B';
+}
+
+void bfs(int i, int j) {
+	q.push({i, j});
 
 	while (q.size()) {
-		pair<int, int> temp = q.front();
+		auto [x, y] = q.front();
 		q.pop();
 
-		x = temp.first;
-		y = temp.second;
+		for (int k = 0; k < 4; k++) {
+			int new_x = x + dx[k];
+			int new_y = y + dy[k];
 
-		if (grid[x][y] == 'B') {
-			break;
-		}
+			if (isDestination(new_x, new_y)) {
+				pre[new_x][new_y] = k;
 
-		if (x)
-		{
-			if (!visited[x - 1][y] and grid[x - 1][y] != '#')
-			{
-				parent[ {x - 1, y}] = {x, y};
-				q.push({x - 1, y});
+				string ans;
+				while (grid[new_x][new_y] != 'A') {
+					int p = pre[new_x][new_y];
+					new_x -= dx[p];
+					new_y -= dy[p];
+					ans += d[p];
+				}
+
+				reverse(ans.begin(), ans.end());
+
+				cout << "YES\n" << ans.size() << '\n' << ans << '\n';
 			}
 
-			visited[x - 1][y] = 1;
-		}
-
-		if (y)
-		{
-			if (!visited[x][y - 1] and grid[x][y - 1] != '#')
-			{
-				parent[ {x, y - 1}] = {x, y};
-				q.push({x, y - 1});
+			else if (isValid(new_x, new_y)) {
+				grid[new_x][new_y] = '*';
+				q.push({new_x, new_y});
+				pre[new_x][new_y] = k;
 			}
-
-			visited[x][y - 1] = 1;
-		}
-
-		if (x < n - 1)
-		{
-			if (!visited[x + 1][y] and grid[x + 1][y] != '#')
-			{
-				parent[ {x + 1, y}] = {x, y};
-				q.push({x + 1, y});
-			}
-
-			visited[x + 1][y] = 1;
-		}
-
-		if (y < m - 1)
-		{
-			if (!visited[x][y + 1] and grid[x][y + 1] != '#')
-			{
-				parent[ {x, y + 1}] = {x, y};
-				q.push({x, y + 1});
-			}
-
-			visited[x][y + 1] = 1;
 		}
 	}
+
+	cout << "NO\n" << endl;
 }
 
 int32_t main()
@@ -78,59 +70,17 @@ int32_t main()
 
 	cin >> n >> m;
 
-	int x, y, a, b;
-
-	for (int i = 0; i < n; ++i) {
+	int x_A, y_A;
+	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
 			cin >> grid[i][j];
 			if (grid[i][j] == 'A') {
-				x = i, y = j;
-			}
-			else if (grid[i][j] == 'B') {
-				a = i, b = j;
+				x_A = i, y_A = j;
 			}
 		}
 	}
 
-	bfs(x, y);
+	bfs(x_A, y_A);
 
-	if (visited[a][b]) {
-		cout << "YES\n";
-	} else {
-		cout << "NO\n";
-	}
-
-	if (visited[a][b]) {
-		vector<pair<int, int>> path;
-		while (1) {
-			path.push_back({a, b});
-
-			if (a == x && b == y) {
-				break;
-			}
-
-			int temp_a = a, temp_b = b;
-			a = parent[ {temp_a, temp_b}].first;
-			b = parent[ {temp_a, temp_b}].second;
-		}
-
-		reverse(path.begin(), path.end());
-
-		string s;
-		for (int i = 0; i < path.size() - 1; i++) {
-
-			if (path[i].first == path[i + 1].first && path[i].second < path[i + 1].second)
-				s += 'R';
-			if (path[i].first == path[i + 1].first && path[i].second > path[i + 1].second)
-				s += 'L';
-			if (path[i].first < path[i + 1].first && path[i].second == path[i + 1].second)
-				s += 'D';
-			if (path[i].first > path[i + 1].first && path[i].second == path[i + 1].second)
-				s += 'U';
-
-		}
-
-		cout << s.length() << '\n' << s;
-	}
 	return 0;
 }
