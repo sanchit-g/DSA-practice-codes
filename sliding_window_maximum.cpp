@@ -4,18 +4,21 @@ using namespace std;
 
 vector<int> maxSlidingWindow(vector<int>& nums, int k) {
 
-	priority_queue<pair<int, int>> heap;    // heap contains pair (nums[index], index)
+	deque<pair<int, int>> dq;   // deque contains pair (nums[index], index)
 	vector<int> ans;    // stores max values of all sliding windows
 
 	for (int i = 0; i < nums.size(); i++) {
-		// pop the max element from heap if it is out of window's range
-		while (!heap.empty() and heap.top().second <= (i - k))
-			heap.pop();
-		// push the curr element (along with its index) into the heap
-		heap.push(make_pair(nums[i], i));
-		// store the max val from heap if we have a valid window (of size k)
+		// pop the front element if it is out of window's range
+		if (!dq.empty() and dq.front().second <= (i - k))
+			dq.pop_front();
+		// maintain the elements inside deque in descending order
+		while (!dq.empty() and dq.back().first < nums[i])
+			dq.pop_back();
+		// push the curr element (along with its index) into the deque
+		dq.push_back(make_pair(nums[i], i));
+		// store the front val of deque if we have a valid window (of size k)
 		if (i >= k - 1)
-			ans.push_back(heap.top().first);
+			ans.push_back(dq.front().first);
 	}
 
 	return ans;
