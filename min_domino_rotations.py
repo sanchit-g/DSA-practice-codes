@@ -1,3 +1,5 @@
+from collections import Counter
+
 class Solution:
     def minDominoRotations(self, A: List[int], B: List[int]) -> int:
         same, countA, countB = Counter(), Counter(A), Counter(B)
