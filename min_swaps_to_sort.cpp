@@ -54,6 +54,7 @@ int minSwaps(vector<int>& nums)
 		{
 			count++;
 			swap(v[i], v[v[i].second]);
+			i--;
 		}
 	}
 
